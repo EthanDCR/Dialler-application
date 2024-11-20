@@ -20,7 +20,7 @@ export default function App() {
 function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Welcome to the Dialer App</Text>
+      <Text style={styles.text}>Welcome to the Dialer </Text>
       <Button
         title="Upload CSV"
         onPress={() => navigation.navigate('UploadCSV')} // Navigate to the UploadCSVScreen
@@ -38,7 +38,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 20,
-    paddingTop: 200,
   },
 });
 
