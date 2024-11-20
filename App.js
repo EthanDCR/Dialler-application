@@ -1,23 +1,30 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, Alert, Button } from "react-native";
+import React from 'react';
+import { StyleSheet, Text, View, Button } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import UploadCSVScreen from './screens/UploadCSVScreen';
 
-
-
+const Stack = createStackNavigator();
 
 export default function App() {
-  const buttonPress = () => {
-    Alert.alert("Button was clicked");
-  };
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="UploadCSV" component={UploadCSVScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
 
+function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}> Welcome to the Dialer App</Text>
-      <StatusBar style="auto" />
-
-      <Button title="Upload CSV" onPress={buttonPress} />
-
-      <StatusBar style="auto" />
+      <Text style={styles.text}>Welcome to the Dialer App</Text>
+      <Button
+        title="Upload CSV"
+        onPress={() => navigation.navigate('UploadCSV')} // Navigate to the UploadCSVScreen
+      />
     </View>
   );
 }
@@ -27,10 +34,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
+    justifyContent: "center",
   },
-
   text: {
     fontSize: 20,
     paddingTop: 200,
   },
 });
+

@@ -59,8 +59,8 @@ export default function UploadCSVScreen() {
           Your CSV should include these columns:{'\n'}
           • name{'\n'}
           • phone{'\n'}
-          • company (optional){'\n'}
-          • email (optional)
+          • roof-type (optional){'\n'}
+          • building adress (optional)
         </Text>
       </View>
     </View>
