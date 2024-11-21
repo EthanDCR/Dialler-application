@@ -23,6 +23,7 @@ export default function UploadCSVScreen() {
 
       if (result.type === "success") {
         setFileName(result.name);
+          console.log("type good");
 
         // Read the file's content
         const formData = new FormData();
