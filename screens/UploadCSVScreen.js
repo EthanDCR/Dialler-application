@@ -6,26 +6,42 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 
 export default function UploadCSVScreen() {
+  // State management for file upload process
   const [fileName, setFileName] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Determine the base URL based on the platform
+  const BASE_URL = Platform.select({
+    web: 'http://localhost:5000',
+    default: 'http://127.0.0.1:5000'
+  });
+
+  // Main document picking and upload function
   const pickDocument = async () => {
     try {
+      // Start loading state
       setLoading(true);
+
+      // Log the base URL for debugging
+      console.log(`Attempting to upload to: ${BASE_URL}/upload`);
+
+      // Use Expo's DocumentPicker to select a CSV file
       const result = await DocumentPicker.getDocumentAsync({
-        type: "text/csv",
-        copyToCacheDirectory: true,
+        type: "text/csv",  // Restrict to CSV files
+        copyToCacheDirectory: true,  // Ensure file is cached locally
       });
 
+      // Check if a file was successfully selected
       if (result.type === "success") {
+        // Update state with selected file name
         setFileName(result.name);
-          console.log("type good");
 
-        // Read the file's content
+        // Create FormData for file upload
         const formData = new FormData();
         formData.append("file", {
           uri: result.uri,
@@ -33,35 +49,57 @@ export default function UploadCSVScreen() {
           type: "text/csv",
         });
 
-        console.log("sending request to backend.");
-
-        // Make a POST request to your Flask backend
-        const response = await fetch("http://127.0.0.1:5000/upload", {
-          method: "POST",
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          body: formData,
+        // Log file details for debugging
+        console.log("File details:", {
+          name: result.name,
+          uri: result.uri,
+          type: result.type
         });
 
-        console.log("nice job");
+        try {
+          // Attempt to upload the file
+          const response = await fetch(`${BASE_URL}/upload`, {
+            method: "POST",
+            body: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
 
-        if (response.ok) {
-          const jsonResponse = await response.json();
-          console.log("Upload success:", jsonResponse);
-          alert("File uploaded successfully!");
-        } else {
-          console.error("Upload failed:", response.status);
-          alert("Failed to upload the file.");
+          // Log response details
+          console.log("Response status:", response.status);
+
+          // Handle the response
+          if (response.ok) {
+            const jsonResponse = await response.json();
+            console.log("Upload success:", jsonResponse);
+            alert("File uploaded successfully!");
+          } else {
+            // Detailed error logging
+            console.error("Upload failed:", response.status);
+            const errorText = await response.text();
+            console.error("Error details:", errorText);
+            alert("Failed to upload the file.");
+          }
+        } catch (fetchError) {
+          console.error("Network error:", {
+            message: fetchError.message,
+            name: fetchError.name,
+            stack: fetchError.stack
+          });
+          alert(`Network error: ${fetchError.message}`);
         }
       }
     } catch (err) {
-      console.error("Error picking document:", err);
+      console.error("Document pick error:", err);
+      alert(`Error: ${err.message}`);
     } finally {
+      // Always reset loading state
       setLoading(false);
     }
   };
 
+  // Render the upload screen
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Upload Contact List</Text>
@@ -76,21 +114,31 @@ export default function UploadCSVScreen() {
         </Text>
       </TouchableOpacity>
 
+      {/* Show loading indicator when processing */}
       {loading && (
-        <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />
+        <ActivityIndicator 
+          size="large" 
+          color="#0000ff" 
+          style={styles.loader} 
+        />
       )}
 
+      {/* Display selected file name */}
       {fileName && (
         <View style={styles.fileInfo}>
           <Text style={styles.fileInfoText}>Selected file: {fileName}</Text>
         </View>
       )}
 
+      {/* CSV Format Guide */}
       <View style={styles.helpSection}>
         <Text style={styles.helpTitle}>CSV Format Guide:</Text>
         <Text style={styles.helpText}>
-          Your CSV should include these columns:{"\n"}• name{"\n"}• phone{"\n"}•
-          roof-type (optional){"\n"}• building adress (optional)
+          Your CSV should include these columns:{"\n"}
+          • name{"\n"}
+          • phone{"\n"}
+          • roof-type (optional){"\n"}
+          • building address (optional)
         </Text>
       </View>
     </View>
