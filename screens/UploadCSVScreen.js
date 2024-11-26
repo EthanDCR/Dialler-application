@@ -10,25 +10,43 @@ import {
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 
+
+
+
 export default function UploadCSVScreen() {
   // State management for file upload process
   const [fileName, setFileName] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Determine the base URL based on the platform
+console.log("test1") //this works, state is fine here.
+
+
+        // Determine the base URL based on the platform
   const BASE_URL = Platform.select({
     web: 'http://localhost:5000',
     default: 'http://127.0.0.1:5000'
   });
 
-  // Main document picking and upload function
+        
+        
+console.log("test2") //this works, state is fine here.
+
+        
+
+        // Main document picking and upload function
   const pickDocument = async () => {
     try {
       // Start loading state
       setLoading(true);
 
       // Log the base URL for debugging
-      console.log(`Attempting to upload to: ${BASE_URL}/upload`);
+      console.log(`Attempting to upload to: ${BASE_URL}/UPLOAD_FOLDER`);
+    
+        if (setLoading(false)){
+            console.log("no good state")
+        }
+
+
 
       // Use Expo's DocumentPicker to select a CSV file
       const result = await DocumentPicker.getDocumentAsync({
@@ -40,6 +58,9 @@ export default function UploadCSVScreen() {
       if (result.type === "success") {
         // Update state with selected file name
         setFileName(result.name);
+        console.log(result.name);
+
+
 
         // Create FormData for file upload
         const formData = new FormData();
